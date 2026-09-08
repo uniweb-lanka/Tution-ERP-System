@@ -1,0 +1,1013 @@
+[
+  {
+    "id": "table.educationLevel",
+    "label": "Create table \"educationLevel\"",
+    "summary": "Creates table \"educationLevel\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"educationLevel\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"educationLevel\"",
+        "sql": "CREATE TABLE \"public\".\"educationLevel\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"displayOrder\" int4 DEFAULT 0 NOT NULL,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"educationLevel_status_check_11063666\" CHECK (\"status\" IN ('active', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"educationLevel\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.grade",
+    "label": "Create table \"grade\"",
+    "summary": "Creates table \"grade\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"grade\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"grade\"",
+        "sql": "CREATE TABLE \"public\".\"grade\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"displayOrder\" int4 DEFAULT 0 NOT NULL,\n  \"educationLevelId\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"grade_status_check_11063666\" CHECK (\"status\" IN ('active', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"grade\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.stream",
+    "label": "Create table \"stream\"",
+    "summary": "Creates table \"stream\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"stream\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"stream\"",
+        "sql": "CREATE TABLE \"public\".\"stream\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"displayOrder\" int4 DEFAULT 0 NOT NULL,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"stream_status_check_11063666\" CHECK (\"status\" IN ('active', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"stream\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.subject",
+    "label": "Create table \"subject\"",
+    "summary": "Creates table \"subject\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"subject\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"subject\"",
+        "sql": "CREATE TABLE \"public\".\"subject\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"description\" text,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"subject_status_check_11063666\" CHECK (\"status\" IN ('active', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"subject\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.educationLevel.educationLevel_id_instituteId_key",
+    "label": "Add unique constraint on \"educationLevel\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "educationLevel_id_instituteId_key",
+        "table": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"educationLevel_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_id_instituteId_key",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"educationLevel_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"educationLevel\" ADD CONSTRAINT \"educationLevel_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"educationLevel_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_id_instituteId_key",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.educationLevel.educationLevel_instituteId_code_key",
+    "label": "Add unique constraint on \"educationLevel\" (instituteId, code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "educationLevel_instituteId_code_key",
+        "table": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"educationLevel_instituteId_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_instituteId_code_key",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"educationLevel_instituteId_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"educationLevel\" ADD CONSTRAINT \"educationLevel_instituteId_code_key\" UNIQUE (\"instituteId\", \"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"educationLevel_instituteId_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_instituteId_code_key",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.grade.grade_id_instituteId_key",
+    "label": "Add unique constraint on \"grade\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "grade_id_instituteId_key",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"grade_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_id_instituteId_key",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"grade_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"grade\" ADD CONSTRAINT \"grade_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"grade_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_id_instituteId_key",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.grade.grade_instituteId_code_key",
+    "label": "Add unique constraint on \"grade\" (instituteId, code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "grade_instituteId_code_key",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"grade_instituteId_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_instituteId_code_key",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"grade_instituteId_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"grade\" ADD CONSTRAINT \"grade_instituteId_code_key\" UNIQUE (\"instituteId\", \"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"grade_instituteId_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_instituteId_code_key",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.stream.stream_id_instituteId_key",
+    "label": "Add unique constraint on \"stream\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "stream_id_instituteId_key",
+        "table": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"stream_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_id_instituteId_key",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"stream_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"stream\" ADD CONSTRAINT \"stream_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"stream_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_id_instituteId_key",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.stream.stream_instituteId_code_key",
+    "label": "Add unique constraint on \"stream\" (instituteId, code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "stream_instituteId_code_key",
+        "table": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"stream_instituteId_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_instituteId_code_key",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"stream_instituteId_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"stream\" ADD CONSTRAINT \"stream_instituteId_code_key\" UNIQUE (\"instituteId\", \"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"stream_instituteId_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_instituteId_code_key",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.subject.subject_id_instituteId_key",
+    "label": "Add unique constraint on \"subject\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "subject_id_instituteId_key",
+        "table": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"subject_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_id_instituteId_key",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"subject_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"subject\" ADD CONSTRAINT \"subject_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"subject_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_id_instituteId_key",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.subject.subject_instituteId_code_key",
+    "label": "Add unique constraint on \"subject\" (instituteId, code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "subject_instituteId_code_key",
+        "table": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"subject_instituteId_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_instituteId_code_key",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"subject_instituteId_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"subject\" ADD CONSTRAINT \"subject_instituteId_code_key\" UNIQUE (\"instituteId\", \"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"subject_instituteId_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_instituteId_code_key",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.educationLevel.educationLevel_instituteId_idx_7d2fe6f2",
+    "label": "Create index \"educationLevel_instituteId_idx_7d2fe6f2\" on \"educationLevel\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "educationLevel_instituteId_idx_7d2fe6f2",
+        "table": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"educationLevel_instituteId_idx_7d2fe6f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"educationLevel_instituteId_idx_7d2fe6f2\"",
+        "sql": "CREATE INDEX \"educationLevel_instituteId_idx_7d2fe6f2\" ON \"public\".\"educationLevel\" (\"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"educationLevel_instituteId_idx_7d2fe6f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.educationLevel.educationLevel_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"educationLevel_instituteId_status_idx_b5328fd7\" on \"educationLevel\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "educationLevel_instituteId_status_idx_b5328fd7",
+        "table": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"educationLevel_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"educationLevel_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"educationLevel_instituteId_status_idx_b5328fd7\" ON \"public\".\"educationLevel\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"educationLevel_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"educationLevel_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.grade.grade_educationLevelId_instituteId_idx_2e857e93",
+    "label": "Create index \"grade_educationLevelId_instituteId_idx_2e857e93\" on \"grade\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "grade_educationLevelId_instituteId_idx_2e857e93",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"grade_educationLevelId_instituteId_idx_2e857e93\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_educationLevelId_instituteId_idx_2e857e93\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"grade_educationLevelId_instituteId_idx_2e857e93\"",
+        "sql": "CREATE INDEX \"grade_educationLevelId_instituteId_idx_2e857e93\" ON \"public\".\"grade\" (\"educationLevelId\", \"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"grade_educationLevelId_instituteId_idx_2e857e93\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_educationLevelId_instituteId_idx_2e857e93\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.grade.grade_instituteId_educationLevelId_idx_93a7c5a6",
+    "label": "Create index \"grade_instituteId_educationLevelId_idx_93a7c5a6\" on \"grade\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "grade_instituteId_educationLevelId_idx_93a7c5a6",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"grade_instituteId_educationLevelId_idx_93a7c5a6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_instituteId_educationLevelId_idx_93a7c5a6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"grade_instituteId_educationLevelId_idx_93a7c5a6\"",
+        "sql": "CREATE INDEX \"grade_instituteId_educationLevelId_idx_93a7c5a6\" ON \"public\".\"grade\" (\"instituteId\", \"educationLevelId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"grade_instituteId_educationLevelId_idx_93a7c5a6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_instituteId_educationLevelId_idx_93a7c5a6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.grade.grade_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"grade_instituteId_status_idx_b5328fd7\" on \"grade\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "grade_instituteId_status_idx_b5328fd7",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"grade_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"grade_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"grade_instituteId_status_idx_b5328fd7\" ON \"public\".\"grade\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"grade_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"grade_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.stream.stream_instituteId_idx_7d2fe6f2",
+    "label": "Create index \"stream_instituteId_idx_7d2fe6f2\" on \"stream\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "stream_instituteId_idx_7d2fe6f2",
+        "table": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"stream_instituteId_idx_7d2fe6f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"stream_instituteId_idx_7d2fe6f2\"",
+        "sql": "CREATE INDEX \"stream_instituteId_idx_7d2fe6f2\" ON \"public\".\"stream\" (\"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"stream_instituteId_idx_7d2fe6f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.stream.stream_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"stream_instituteId_status_idx_b5328fd7\" on \"stream\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "stream_instituteId_status_idx_b5328fd7",
+        "table": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"stream_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"stream_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"stream_instituteId_status_idx_b5328fd7\" ON \"public\".\"stream\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"stream_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"stream_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.subject.subject_instituteId_idx_7d2fe6f2",
+    "label": "Create index \"subject_instituteId_idx_7d2fe6f2\" on \"subject\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "subject_instituteId_idx_7d2fe6f2",
+        "table": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"subject_instituteId_idx_7d2fe6f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"subject_instituteId_idx_7d2fe6f2\"",
+        "sql": "CREATE INDEX \"subject_instituteId_idx_7d2fe6f2\" ON \"public\".\"subject\" (\"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"subject_instituteId_idx_7d2fe6f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.subject.subject_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"subject_instituteId_status_idx_b5328fd7\" on \"subject\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "subject_instituteId_status_idx_b5328fd7",
+        "table": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"subject_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"subject_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"subject_instituteId_status_idx_b5328fd7\" ON \"public\".\"subject\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"subject_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subject_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.educationLevel.educationLevel_instituteId_fkey",
+    "label": "Add foreign key \"educationLevel_instituteId_fkey\" on \"educationLevel\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "educationLevel_instituteId_fkey",
+        "table": "educationLevel"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"educationLevel_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_instituteId_fkey",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"educationLevel_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"educationLevel\"\nADD CONSTRAINT \"educationLevel_instituteId_fkey\"\nFOREIGN KEY (\"instituteId\")\nREFERENCES \"public\".\"institute\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"educationLevel_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "educationLevel_instituteId_fkey",
+          "public",
+          "\"public\".\"educationLevel\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.grade.grade_educationLevelId_instituteId_fkey",
+    "label": "Add foreign key \"grade_educationLevelId_instituteId_fkey\" on \"grade\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "grade_educationLevelId_instituteId_fkey",
+        "table": "grade"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"grade_educationLevelId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_educationLevelId_instituteId_fkey",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"grade_educationLevelId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"grade\"\nADD CONSTRAINT \"grade_educationLevelId_instituteId_fkey\"\nFOREIGN KEY (\"educationLevelId\", \"instituteId\")\nREFERENCES \"public\".\"educationLevel\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"grade_educationLevelId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "grade_educationLevelId_instituteId_fkey",
+          "public",
+          "\"public\".\"grade\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.stream.stream_instituteId_fkey",
+    "label": "Add foreign key \"stream_instituteId_fkey\" on \"stream\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "stream_instituteId_fkey",
+        "table": "stream"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"stream_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_instituteId_fkey",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"stream_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"stream\"\nADD CONSTRAINT \"stream_instituteId_fkey\"\nFOREIGN KEY (\"instituteId\")\nREFERENCES \"public\".\"institute\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"stream_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "stream_instituteId_fkey",
+          "public",
+          "\"public\".\"stream\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.subject.subject_instituteId_fkey",
+    "label": "Add foreign key \"subject_instituteId_fkey\" on \"subject\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "subject_instituteId_fkey",
+        "table": "subject"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"subject_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_instituteId_fkey",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"subject_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"subject\"\nADD CONSTRAINT \"subject_instituteId_fkey\"\nFOREIGN KEY (\"instituteId\")\nREFERENCES \"public\".\"institute\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"subject_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subject_instituteId_fkey",
+          "public",
+          "\"public\".\"subject\""
+        ]
+      }
+    ]
+  }
+]

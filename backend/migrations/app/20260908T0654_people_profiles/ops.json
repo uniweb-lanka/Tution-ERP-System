@@ -1,0 +1,656 @@
+[
+  {
+    "id": "table.staff",
+    "label": "Create table \"staff\"",
+    "summary": "Creates table \"staff\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "staff"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"staff\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"staff\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"staff\"",
+        "sql": "CREATE TABLE \"public\".\"staff\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"joinedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"leftAt\" timestamptz,\n  \"membershipId\" text NOT NULL,\n  \"staffCode\" text NOT NULL,\n  \"staffType\" text DEFAULT 'support' NOT NULL,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"staff_staffType_check_d8b58671\" CHECK (\"staffType\" IN ('admin', 'accountant', 'receptionist', 'manager', 'support', 'other')),\n  CONSTRAINT \"staff_status_check_350ef39a\" CHECK (\"status\" IN ('active', 'inactive', 'suspended', 'left'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"staff\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"staff\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.student",
+    "label": "Create table \"student\"",
+    "summary": "Creates table \"student\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "student"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"student\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"student\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"student\"",
+        "sql": "CREATE TABLE \"public\".\"student\" (\n  \"admissionAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"dateOfBirth\" timestamptz,\n  \"deletedAt\" timestamptz,\n  \"gender\" text,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"membershipId\" text NOT NULL,\n  \"notes\" text,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"studentCode\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"student_gender_check_4048f77b\" CHECK (\"gender\" IN ('male', 'female', 'other', 'prefer_not_to_say')),\n  CONSTRAINT \"student_status_check_350ef39a\" CHECK (\"status\" IN ('active', 'inactive', 'suspended', 'left'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"student\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"student\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.teacher",
+    "label": "Create table \"teacher\"",
+    "summary": "Creates table \"teacher\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "teacher"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"teacher\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teacher\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"teacher\"",
+        "sql": "CREATE TABLE \"public\".\"teacher\" (\n  \"bio\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"joinedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"leftAt\" timestamptz,\n  \"membershipId\" text NOT NULL,\n  \"qualification\" text,\n  \"specialization\" text,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"teacherCode\" text NOT NULL,\n  \"teacherType\" text DEFAULT 'part_time' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"teacher_status_check_350ef39a\" CHECK (\"status\" IN ('active', 'inactive', 'suspended', 'left')),\n  CONSTRAINT \"teacher_teacherType_check_78ab743c\" CHECK (\"teacherType\" IN ('permanent', 'part_time', 'visiting', 'contract'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"teacher\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teacher\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.instituteMembership.instituteMembership_id_instituteId_key",
+    "label": "Add unique constraint on \"instituteMembership\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "instituteMembership_id_instituteId_key",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"instituteMembership_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_id_instituteId_key",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"instituteMembership_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"instituteMembership\" ADD CONSTRAINT \"instituteMembership_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"instituteMembership_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_id_instituteId_key",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.staff.staff_membershipId_instituteId_key",
+    "label": "Add unique constraint on \"staff\" (membershipId, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "staff_membershipId_instituteId_key",
+        "table": "staff"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"staff_membershipId_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"staff_membershipId_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"staff\" ADD CONSTRAINT \"staff_membershipId_instituteId_key\" UNIQUE (\"membershipId\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"staff_membershipId_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.staff.staff_instituteId_staffCode_key",
+    "label": "Add unique constraint on \"staff\" (instituteId, staffCode)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "staff_instituteId_staffCode_key",
+        "table": "staff"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"staff_instituteId_staffCode_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_instituteId_staffCode_key",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"staff_instituteId_staffCode_key\"",
+        "sql": "ALTER TABLE \"public\".\"staff\" ADD CONSTRAINT \"staff_instituteId_staffCode_key\" UNIQUE (\"instituteId\", \"staffCode\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"staff_instituteId_staffCode_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_instituteId_staffCode_key",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.student.student_membershipId_instituteId_key",
+    "label": "Add unique constraint on \"student\" (membershipId, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "student_membershipId_instituteId_key",
+        "table": "student"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"student_membershipId_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"student_membershipId_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"student\" ADD CONSTRAINT \"student_membershipId_instituteId_key\" UNIQUE (\"membershipId\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"student_membershipId_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.student.student_instituteId_studentCode_key",
+    "label": "Add unique constraint on \"student\" (instituteId, studentCode)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "student_instituteId_studentCode_key",
+        "table": "student"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"student_instituteId_studentCode_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_instituteId_studentCode_key",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"student_instituteId_studentCode_key\"",
+        "sql": "ALTER TABLE \"public\".\"student\" ADD CONSTRAINT \"student_instituteId_studentCode_key\" UNIQUE (\"instituteId\", \"studentCode\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"student_instituteId_studentCode_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_instituteId_studentCode_key",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.teacher.teacher_membershipId_instituteId_key",
+    "label": "Add unique constraint on \"teacher\" (membershipId, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "teacher_membershipId_instituteId_key",
+        "table": "teacher"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"teacher_membershipId_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"teacher_membershipId_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"teacher\" ADD CONSTRAINT \"teacher_membershipId_instituteId_key\" UNIQUE (\"membershipId\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"teacher_membershipId_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_membershipId_instituteId_key",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.teacher.teacher_instituteId_teacherCode_key",
+    "label": "Add unique constraint on \"teacher\" (instituteId, teacherCode)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "teacher_instituteId_teacherCode_key",
+        "table": "teacher"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"teacher_instituteId_teacherCode_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_instituteId_teacherCode_key",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"teacher_instituteId_teacherCode_key\"",
+        "sql": "ALTER TABLE \"public\".\"teacher\" ADD CONSTRAINT \"teacher_instituteId_teacherCode_key\" UNIQUE (\"instituteId\", \"teacherCode\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"teacher_instituteId_teacherCode_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_instituteId_teacherCode_key",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.staff.staff_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"staff_instituteId_status_idx_b5328fd7\" on \"staff\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "staff_instituteId_status_idx_b5328fd7",
+        "table": "staff"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"staff_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"staff_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"staff_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"staff_instituteId_status_idx_b5328fd7\" ON \"public\".\"staff\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"staff_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"staff_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.student.student_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"student_instituteId_status_idx_b5328fd7\" on \"student\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "student_instituteId_status_idx_b5328fd7",
+        "table": "student"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"student_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"student_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"student_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"student_instituteId_status_idx_b5328fd7\" ON \"public\".\"student\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"student_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"student_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.teacher.teacher_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"teacher_instituteId_status_idx_b5328fd7\" on \"teacher\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "teacher_instituteId_status_idx_b5328fd7",
+        "table": "teacher"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"teacher_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teacher_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"teacher_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"teacher_instituteId_status_idx_b5328fd7\" ON \"public\".\"teacher\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"teacher_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teacher_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.staff.staff_membershipId_instituteId_fkey",
+    "label": "Add foreign key \"staff_membershipId_instituteId_fkey\" on \"staff\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "staff_membershipId_instituteId_fkey",
+        "table": "staff"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"staff_membershipId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"staff_membershipId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"staff\"\nADD CONSTRAINT \"staff_membershipId_instituteId_fkey\"\nFOREIGN KEY (\"membershipId\", \"instituteId\")\nREFERENCES \"public\".\"instituteMembership\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"staff_membershipId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "staff_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"staff\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.student.student_membershipId_instituteId_fkey",
+    "label": "Add foreign key \"student_membershipId_instituteId_fkey\" on \"student\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "student_membershipId_instituteId_fkey",
+        "table": "student"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"student_membershipId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"student_membershipId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"student\"\nADD CONSTRAINT \"student_membershipId_instituteId_fkey\"\nFOREIGN KEY (\"membershipId\", \"instituteId\")\nREFERENCES \"public\".\"instituteMembership\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"student_membershipId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "student_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"student\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.teacher.teacher_membershipId_instituteId_fkey",
+    "label": "Add foreign key \"teacher_membershipId_instituteId_fkey\" on \"teacher\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "teacher_membershipId_instituteId_fkey",
+        "table": "teacher"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"teacher_membershipId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"teacher_membershipId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"teacher\"\nADD CONSTRAINT \"teacher_membershipId_instituteId_fkey\"\nFOREIGN KEY (\"membershipId\", \"instituteId\")\nREFERENCES \"public\".\"instituteMembership\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"teacher_membershipId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teacher_membershipId_instituteId_fkey",
+          "public",
+          "\"public\".\"teacher\""
+        ]
+      }
+    ]
+  }
+]
