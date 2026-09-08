@@ -16,6 +16,10 @@
       "model": "EducationLevel",
       "namespace": "public"
     },
+    "enrollment": {
+      "model": "Enrollment",
+      "namespace": "public"
+    },
     "grade": {
       "model": "Grade",
       "namespace": "public"
@@ -109,6 +113,27 @@
               {
                 "name": "hybrid",
                 "value": "hybrid"
+              }
+            ]
+          },
+          "enrollment_status": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "active",
+                "value": "active"
+              },
+              {
+                "name": "paused",
+                "value": "paused"
+              },
+              {
+                "name": "completed",
+                "value": "completed"
+              },
+              {
+                "name": "cancelled",
+                "value": "cancelled"
               }
             ]
           },
@@ -800,6 +825,158 @@
               },
               "namespaceId": "public",
               "table": "educationLevel"
+            }
+          },
+          "Enrollment": {
+            "fields": {
+              "classId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "endedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "enrolledAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "instituteId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "notes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "enrollment_status",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "studentId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "class": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "classId",
+                    "instituteId"
+                  ],
+                  "targetFields": [
+                    "id",
+                    "instituteId"
+                  ]
+                },
+                "to": {
+                  "model": "Class",
+                  "namespace": "public"
+                }
+              },
+              "student": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "studentId",
+                    "instituteId"
+                  ],
+                  "targetFields": [
+                    "id",
+                    "instituteId"
+                  ]
+                },
+                "to": {
+                  "model": "Student",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "classId": {
+                  "column": "classId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "endedAt": {
+                  "column": "endedAt"
+                },
+                "enrolledAt": {
+                  "column": "enrolledAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "instituteId": {
+                  "column": "instituteId"
+                },
+                "notes": {
+                  "column": "notes"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "studentId": {
+                  "column": "studentId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "enrollment"
             }
           },
           "Grade": {
@@ -2550,6 +2727,193 @@
                 }
               ]
             },
+            "enrollment": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('active', 'paused', 'completed', 'cancelled')",
+                  "name": "enrollment_status_check_08674715",
+                  "prefix": "enrollment_status_check"
+                }
+              ],
+              "columns": {
+                "classId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "endedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "enrolledAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "instituteId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "notes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "active"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "enrollment_status",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "studentId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "studentId",
+                      "instituteId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "enrollment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id",
+                      "instituteId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "student"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "classId",
+                      "instituteId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "enrollment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id",
+                      "instituteId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "class"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "classId",
+                    "instituteId"
+                  ],
+                  "name": "enrollment_classId_instituteId_idx_4bc20ca6",
+                  "prefix": "enrollment_classId_instituteId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "instituteId",
+                    "classId"
+                  ],
+                  "name": "enrollment_instituteId_classId_idx_c38ab17c",
+                  "prefix": "enrollment_instituteId_classId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "instituteId",
+                    "status"
+                  ],
+                  "name": "enrollment_instituteId_status_idx_b5328fd7",
+                  "prefix": "enrollment_instituteId_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "instituteId",
+                    "studentId"
+                  ],
+                  "name": "enrollment_instituteId_studentId_idx_aedbc27b",
+                  "prefix": "enrollment_instituteId_studentId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "studentId",
+                    "instituteId"
+                  ],
+                  "name": "enrollment_studentId_instituteId_idx_77a018a9",
+                  "prefix": "enrollment_studentId_instituteId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "id",
+                    "instituteId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "studentId",
+                    "classId"
+                  ]
+                }
+              ]
+            },
             "grade": {
               "checks": [
                 {
@@ -3822,6 +4186,15 @@
                 "hybrid"
               ]
             },
+            "enrollment_status": {
+              "kind": "valueSet",
+              "values": [
+                "active",
+                "paused",
+                "completed",
+                "cancelled"
+              ]
+            },
             "gender": {
               "kind": "valueSet",
               "values": [
@@ -3905,10 +4278,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ec22e10fa939e17d205413381d9efe8b0589e0cac6414950290bfad274ce419c"
+    "storageHash": "0e5bebced7f2a03afefe923d234e86bfbea439d6cfaffb36ae603e0655fb9b03"
   },
   "execution": {
-    "executionHash": "c5d70546f432765ad8b9b12f27cf0b2da4aab49c9f65d04ca854505966a5be3a",
+    "executionHash": "d9497ca3863a6808c1a4cbfec9a8f24bcd72123fbe7830201dbf0e2e4d5a0a7b",
     "mutations": {
       "defaults": [
         {
@@ -3942,6 +4315,17 @@
             "column": "id",
             "namespace": "public",
             "table": "educationLevel"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "enrollment"
           }
         },
         {

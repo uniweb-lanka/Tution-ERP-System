@@ -1,0 +1,404 @@
+[
+  {
+    "id": "table.enrollment",
+    "label": "Create table \"enrollment\"",
+    "summary": "Creates table \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"enrollment\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"enrollment\"",
+        "sql": "CREATE TABLE \"public\".\"enrollment\" (\n  \"classId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"endedAt\" timestamptz,\n  \"enrolledAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"notes\" text,\n  \"status\" text DEFAULT 'active' NOT NULL,\n  \"studentId\" text NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"enrollment_status_check_08674715\" CHECK (\"status\" IN ('active', 'paused', 'completed', 'cancelled'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"enrollment\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.enrollment.enrollment_id_instituteId_key",
+    "label": "Add unique constraint on \"enrollment\" (id, instituteId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "enrollment_id_instituteId_key",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"enrollment_id_instituteId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_id_instituteId_key",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"enrollment_id_instituteId_key\"",
+        "sql": "ALTER TABLE \"public\".\"enrollment\" ADD CONSTRAINT \"enrollment_id_instituteId_key\" UNIQUE (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"enrollment_id_instituteId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_id_instituteId_key",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.enrollment.enrollment_studentId_classId_key",
+    "label": "Add unique constraint on \"enrollment\" (studentId, classId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "enrollment_studentId_classId_key",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"enrollment_studentId_classId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_studentId_classId_key",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"enrollment_studentId_classId_key\"",
+        "sql": "ALTER TABLE \"public\".\"enrollment\" ADD CONSTRAINT \"enrollment_studentId_classId_key\" UNIQUE (\"studentId\", \"classId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"enrollment_studentId_classId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_studentId_classId_key",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.enrollment.enrollment_classId_instituteId_idx_4bc20ca6",
+    "label": "Create index \"enrollment_classId_instituteId_idx_4bc20ca6\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "enrollment_classId_instituteId_idx_4bc20ca6",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"enrollment_classId_instituteId_idx_4bc20ca6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_classId_instituteId_idx_4bc20ca6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"enrollment_classId_instituteId_idx_4bc20ca6\"",
+        "sql": "CREATE INDEX \"enrollment_classId_instituteId_idx_4bc20ca6\" ON \"public\".\"enrollment\" (\"classId\", \"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"enrollment_classId_instituteId_idx_4bc20ca6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_classId_instituteId_idx_4bc20ca6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.enrollment.enrollment_instituteId_classId_idx_c38ab17c",
+    "label": "Create index \"enrollment_instituteId_classId_idx_c38ab17c\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "enrollment_instituteId_classId_idx_c38ab17c",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"enrollment_instituteId_classId_idx_c38ab17c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_classId_idx_c38ab17c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"enrollment_instituteId_classId_idx_c38ab17c\"",
+        "sql": "CREATE INDEX \"enrollment_instituteId_classId_idx_c38ab17c\" ON \"public\".\"enrollment\" (\"instituteId\", \"classId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"enrollment_instituteId_classId_idx_c38ab17c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_classId_idx_c38ab17c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.enrollment.enrollment_instituteId_status_idx_b5328fd7",
+    "label": "Create index \"enrollment_instituteId_status_idx_b5328fd7\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "enrollment_instituteId_status_idx_b5328fd7",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"enrollment_instituteId_status_idx_b5328fd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"enrollment_instituteId_status_idx_b5328fd7\"",
+        "sql": "CREATE INDEX \"enrollment_instituteId_status_idx_b5328fd7\" ON \"public\".\"enrollment\" (\"instituteId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"enrollment_instituteId_status_idx_b5328fd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_status_idx_b5328fd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.enrollment.enrollment_instituteId_studentId_idx_aedbc27b",
+    "label": "Create index \"enrollment_instituteId_studentId_idx_aedbc27b\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "enrollment_instituteId_studentId_idx_aedbc27b",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"enrollment_instituteId_studentId_idx_aedbc27b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_studentId_idx_aedbc27b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"enrollment_instituteId_studentId_idx_aedbc27b\"",
+        "sql": "CREATE INDEX \"enrollment_instituteId_studentId_idx_aedbc27b\" ON \"public\".\"enrollment\" (\"instituteId\", \"studentId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"enrollment_instituteId_studentId_idx_aedbc27b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_instituteId_studentId_idx_aedbc27b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.enrollment.enrollment_studentId_instituteId_idx_77a018a9",
+    "label": "Create index \"enrollment_studentId_instituteId_idx_77a018a9\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "enrollment_studentId_instituteId_idx_77a018a9",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"enrollment_studentId_instituteId_idx_77a018a9\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_studentId_instituteId_idx_77a018a9\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"enrollment_studentId_instituteId_idx_77a018a9\"",
+        "sql": "CREATE INDEX \"enrollment_studentId_instituteId_idx_77a018a9\" ON \"public\".\"enrollment\" (\"studentId\", \"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"enrollment_studentId_instituteId_idx_77a018a9\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"enrollment_studentId_instituteId_idx_77a018a9\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.enrollment.enrollment_studentId_instituteId_fkey",
+    "label": "Add foreign key \"enrollment_studentId_instituteId_fkey\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "enrollment_studentId_instituteId_fkey",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"enrollment_studentId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_studentId_instituteId_fkey",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"enrollment_studentId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"enrollment\"\nADD CONSTRAINT \"enrollment_studentId_instituteId_fkey\"\nFOREIGN KEY (\"studentId\", \"instituteId\")\nREFERENCES \"public\".\"student\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"enrollment_studentId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_studentId_instituteId_fkey",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.enrollment.enrollment_classId_instituteId_fkey",
+    "label": "Add foreign key \"enrollment_classId_instituteId_fkey\" on \"enrollment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "enrollment_classId_instituteId_fkey",
+        "table": "enrollment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"enrollment_classId_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_classId_instituteId_fkey",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"enrollment_classId_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"enrollment\"\nADD CONSTRAINT \"enrollment_classId_instituteId_fkey\"\nFOREIGN KEY (\"classId\", \"instituteId\")\nREFERENCES \"public\".\"class\" (\"id\", \"instituteId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"enrollment_classId_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "enrollment_classId_instituteId_fkey",
+          "public",
+          "\"public\".\"enrollment\""
+        ]
+      }
+    ]
+  }
+]

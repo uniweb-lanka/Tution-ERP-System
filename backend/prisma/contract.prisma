@@ -100,6 +100,45 @@ enum weekday {
   sunday    = "sunday"
 }
 
+enum enrollment_status {
+  @@type("pg/text@1")
+
+  active    = "active"
+  paused    = "paused"
+  completed = "completed"
+  cancelled = "cancelled"
+}
+
+model Enrollment {
+  id          String            @id @default(uuid())
+  instituteId String
+  studentId   String
+  classId     String
+  status      enrollment_status @default(active)
+  enrolledAt  DateTime          @default(now())
+  endedAt     DateTime?
+  notes       String?
+
+  student Student @relation(
+    fields: [studentId, instituteId],
+    references: [id, instituteId]
+  )
+
+  class Class @relation(
+    fields: [classId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([studentId, classId])
+  @@index([instituteId, status])
+  @@index([instituteId, studentId])
+  @@index([instituteId, classId])
+}
+
 model Class {
   id          String        @id @default(uuid())
   instituteId String
