@@ -2,10 +2,7 @@ import bcrypt from "bcryptjs";
 import { Temporal } from "temporal-polyfill";
 
 import { db } from "../db/db.js";
-import type {
-  LoginInput,
-  RegisterInput,
-} from "./auth.schema.js";
+import type { LoginInput, RegisterInput } from "./auth.schema.js";
 import {
   createAccessToken,
   createRefreshToken,
@@ -134,7 +131,11 @@ export async function loginInstituteUser(input: LoginInput) {
     slug: input.instituteSlug,
   });
 
-  if (!institute || institute.status === "inactive" || institute.status === "suspended") {
+  if (
+    !institute ||
+    institute.status === "inactive" ||
+    institute.status === "suspended"
+  ) {
     throw new AuthInvalidCredentialsError();
   }
 
@@ -162,18 +163,13 @@ export async function loginInstituteUser(input: LoginInput) {
       role: membership.role,
     });
 
-    const refreshToken = createRefreshToken(
-      user.id,
-      session.id,
-    );
+    const refreshToken = createRefreshToken(user.id, session.id, institute.id);
 
     const refreshTokenHash = hashRefreshToken(refreshToken);
 
-    await tx.orm.public.AuthSession
-      .where({ id: session.id })
-      .update({
-        refreshTokenHash,
-      });
+    await tx.orm.public.AuthSession.where({ id: session.id }).update({
+      refreshTokenHash,
+    });
 
     return {
       accessToken,

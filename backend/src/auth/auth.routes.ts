@@ -9,6 +9,11 @@ import {
 import { loginSchema, registerSchema } from "./auth.schema.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { db } from "../db/db.js";
+import {
+  AuthRefreshError,
+  refreshAccessToken,
+} from "./auth.refresh.js";
+
 
 export const authRouter = Router();
 
@@ -169,6 +174,55 @@ authRouter.get("/me", authenticate, async (request, response) => {
 
     response.status(500).json({
       error: "Unable to get current user",
+    });
+  }
+});
+
+authRouter.post("/refresh", async (request, response) => {
+  try {
+    const refreshToken = request.cookies.refresh_token;
+
+    if (
+      typeof refreshToken !== "string" ||
+      refreshToken.length === 0
+    ) {
+      response.status(401).json({
+        error: "Refresh token required",
+      });
+      return;
+    }
+
+    const result = await refreshAccessToken(refreshToken);
+
+    response.cookie("refresh_token", result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    response.status(200).json({
+      message: "Token refreshed successfully",
+      data: {
+        user: result.user,
+        institute: result.institute,
+        membership: result.membership,
+        accessToken: result.accessToken,
+      },
+    });
+  } catch (error) {
+    if (error instanceof AuthRefreshError) {
+      response.status(401).json({
+        error: error.message,
+      });
+      return;
+    }
+
+    console.error("POST /api/auth/refresh error:", error);
+
+    response.status(500).json({
+      error: "Failed to refresh authentication",
     });
   }
 });
