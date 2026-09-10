@@ -7,6 +7,8 @@ import {
   registerInstituteOwner,
 } from "./auth.service.js";
 import { loginSchema, registerSchema } from "./auth.schema.js";
+import { authenticate } from "../middleware/auth.middleware.js";
+import { db } from "../db/db.js";
 
 export const authRouter = Router();
 
@@ -87,6 +89,86 @@ authRouter.post("/login", async (request, response) => {
 
     response.status(500).json({
       error: "Unable to login",
+    });
+  }
+});
+
+authRouter.get("/me", authenticate, async (request, response) => {
+  const auth = request.auth;
+
+  if (!auth) {
+    response.status(401).json({
+      error: "Authentication required",
+    });
+    return;
+  }
+
+  try {
+    const user = await db.orm.public.User.first({
+      id: auth.userId,
+    });
+
+    if (!user) {
+      response.status(401).json({
+        error: "User not found",
+      });
+      return;
+    }
+
+    const institute = await db.orm.public.Institute.first({
+      id: auth.instituteId,
+    });
+
+    if (!institute) {
+      response.status(401).json({
+        error: "Institute not found",
+      });
+      return;
+    }
+
+    const membership = await db.orm.public.InstituteMembership.first({
+      id: auth.membershipId,
+      userId: auth.userId,
+      instituteId: auth.instituteId,
+      status: "active",
+    });
+
+    if (!membership) {
+      response.status(403).json({
+        error: "Active institute membership not found",
+      });
+      return;
+    }
+
+    response.status(200).json({
+      data: {
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone,
+        },
+        institute: {
+          id: institute.id,
+          name: institute.name,
+          slug: institute.slug,
+          timezone: institute.timezone,
+          currency: institute.currency,
+          status: institute.status,
+        },
+        membership: {
+          id: membership.id,
+          role: membership.role,
+          status: membership.status,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Get current user failed:", error);
+
+    response.status(500).json({
+      error: "Unable to get current user",
     });
   }
 });
