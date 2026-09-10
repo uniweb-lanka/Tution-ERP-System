@@ -2,12 +2,28 @@ import bcrypt from "bcryptjs";
 import { Temporal } from "temporal-polyfill";
 
 import { db } from "../db/db.js";
-import type { RegisterInput } from "./auth.schema.js";
+import type {
+  LoginInput,
+  RegisterInput,
+} from "./auth.schema.js";
+import {
+  createAccessToken,
+  createRefreshToken,
+  getRefreshTokenExpiry,
+  hashRefreshToken,
+} from "./auth.tokens.js";
 
 export class AuthConflictError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "AuthConflictError";
+  }
+}
+
+export class AuthInvalidCredentialsError extends Error {
+  constructor() {
+    super("Invalid email, password, or institute");
+    this.name = "AuthInvalidCredentialsError";
   }
 }
 
@@ -93,5 +109,101 @@ export async function registerInstituteOwner(input: RegisterInput) {
       status: result.membership.status,
       joinedAt: result.membership.joinedAt,
     },
+  };
+}
+
+export async function loginInstituteUser(input: LoginInput) {
+  const user = await db.orm.public.User.first({
+    email: input.email,
+  });
+
+  if (!user || !user.passwordHash) {
+    throw new AuthInvalidCredentialsError();
+  }
+
+  const passwordMatches = await bcrypt.compare(
+    input.password,
+    user.passwordHash,
+  );
+
+  if (!passwordMatches) {
+    throw new AuthInvalidCredentialsError();
+  }
+
+  const institute = await db.orm.public.Institute.first({
+    slug: input.instituteSlug,
+  });
+
+  if (!institute || institute.status === "inactive" || institute.status === "suspended") {
+    throw new AuthInvalidCredentialsError();
+  }
+
+  const membership = await db.orm.public.InstituteMembership.first({
+    userId: user.id,
+    instituteId: institute.id,
+    status: "active",
+  });
+
+  if (!membership) {
+    throw new AuthInvalidCredentialsError();
+  }
+
+  const result = await db.transaction(async (tx) => {
+    const session = await tx.orm.public.AuthSession.create({
+      userId: user.id,
+      refreshTokenHash: "pending",
+      expiresAt: getRefreshTokenExpiry(),
+    });
+
+    const accessToken = createAccessToken({
+      sub: user.id,
+      instituteId: institute.id,
+      membershipId: membership.id,
+      role: membership.role,
+    });
+
+    const refreshToken = createRefreshToken(
+      user.id,
+      session.id,
+    );
+
+    const refreshTokenHash = hashRefreshToken(refreshToken);
+
+    await tx.orm.public.AuthSession
+      .where({ id: session.id })
+      .update({
+        refreshTokenHash,
+      });
+
+    return {
+      accessToken,
+      refreshToken,
+      sessionId: session.id,
+    };
+  });
+
+  return {
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+    },
+    institute: {
+      id: institute.id,
+      name: institute.name,
+      slug: institute.slug,
+      timezone: institute.timezone,
+      currency: institute.currency,
+      status: institute.status,
+    },
+    membership: {
+      id: membership.id,
+      role: membership.role,
+      status: membership.status,
+    },
+    accessToken: result.accessToken,
+    refreshToken: result.refreshToken,
   };
 }
