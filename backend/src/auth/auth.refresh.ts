@@ -184,3 +184,27 @@ export async function refreshAccessToken(refreshToken: string) {
     refreshToken: result.refreshToken,
   };
 }
+
+export async function logoutUser(refreshToken: string) {
+  const tokenHash = hashRefreshToken(refreshToken);
+
+  const session = await db.orm.public.AuthSession.first({
+    refreshTokenHash: tokenHash,
+  });
+
+  if (!session) {
+    return;
+  }
+
+  if (session.revokedAt) {
+    return;
+  }
+
+  await db.orm.public.AuthSession
+    .where({
+      id: session.id,
+    })
+    .update({
+      revokedAt: Temporal.Now.instant(),
+    });
+}

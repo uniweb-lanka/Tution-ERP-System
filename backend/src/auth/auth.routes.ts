@@ -11,9 +11,9 @@ import { authenticate } from "../middleware/auth.middleware.js";
 import { db } from "../db/db.js";
 import {
   AuthRefreshError,
+  logoutUser,
   refreshAccessToken,
 } from "./auth.refresh.js";
-
 
 export const authRouter = Router();
 
@@ -182,10 +182,7 @@ authRouter.post("/refresh", async (request, response) => {
   try {
     const refreshToken = request.cookies.refresh_token;
 
-    if (
-      typeof refreshToken !== "string" ||
-      refreshToken.length === 0
-    ) {
+    if (typeof refreshToken !== "string" || refreshToken.length === 0) {
       response.status(401).json({
         error: "Refresh token required",
       });
@@ -223,6 +220,33 @@ authRouter.post("/refresh", async (request, response) => {
 
     response.status(500).json({
       error: "Failed to refresh authentication",
+    });
+  }
+});
+
+authRouter.post("/logout", async (request, response) => {
+  try {
+    const refreshToken = request.cookies.refresh_token;
+
+    if (typeof refreshToken === "string" && refreshToken.length > 0) {
+      await logoutUser(refreshToken);
+    }
+
+    response.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/api/auth",
+    });
+
+    response.status(200).json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    console.error("POST /api/auth/logout error:", error);
+
+    response.status(500).json({
+      error: "Failed to logout",
     });
   }
 });
