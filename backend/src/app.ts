@@ -5,6 +5,7 @@ import helmet from "helmet";
 
 import { env } from "./config/env.js";
 import { healthRouter } from "./routes/health.js";
+import { authRouter } from "./auth/auth.routes.js";
 
 export function createApp() {
   const app = express();
@@ -20,6 +21,7 @@ export function createApp() {
   app.use(express.json({ limit: "1mb" }));
   app.use(cookieParser());
   app.use("/api/health", healthRouter);
+  app.use("/api/auth", authRouter);
 
   app.use((_request, response) => {
     response.status(404).json({ error: "Route not found" });
