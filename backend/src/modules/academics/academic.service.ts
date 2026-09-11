@@ -7,6 +7,8 @@ import type {
   UpdateGradeInput,
   CreateStreamInput,
   UpdateStreamInput,
+  CreateSubjectInput,
+  UpdateSubjectInput,
 } from "./academic.schema.js";
 
 export class EducationLevelNotFoundError extends Error {
@@ -394,4 +396,130 @@ export async function updateStream(
     id: streamId,
     instituteId,
   }).update(updateData);
+}
+
+export class SubjectNotFoundError extends Error {
+  constructor() {
+    super("Subject not found");
+    this.name = "SubjectNotFoundError";
+  }
+}
+
+export class SubjectConflictError extends Error {
+  constructor(message = "Subject code already exists") {
+    super(message);
+    this.name = "SubjectConflictError";
+  }
+}
+
+export async function listSubjects(instituteId: string) {
+  return db.orm.public.Subject.where({
+    instituteId,
+  }).all();
+}
+
+export async function getSubject(
+  instituteId: string,
+  subjectId: string,
+) {
+  const subject = await db.orm.public.Subject.first({
+    id: subjectId,
+    instituteId,
+  });
+
+  if (!subject) {
+    throw new SubjectNotFoundError();
+  }
+
+  return subject;
+}
+
+export async function createSubject(
+  instituteId: string,
+  input: CreateSubjectInput,
+) {
+  const existing = await db.orm.public.Subject.first({
+    instituteId,
+    code: input.code,
+  });
+
+  if (existing) {
+    throw new SubjectConflictError();
+  }
+
+  const createData: {
+    instituteId: string;
+    name: string;
+    code: string;
+    description?: string;
+  } = {
+    instituteId,
+    name: input.name,
+    code: input.code,
+  };
+
+  if (input.description !== undefined) {
+    createData.description = input.description;
+  }
+
+  return db.orm.public.Subject.create(createData);
+}
+
+export async function updateSubject(
+  instituteId: string,
+  subjectId: string,
+  input: UpdateSubjectInput,
+) {
+  const subject = await db.orm.public.Subject.first({
+    id: subjectId,
+    instituteId,
+  });
+
+  if (!subject) {
+    throw new SubjectNotFoundError();
+  }
+
+  if (
+    input.code !== undefined &&
+    input.code !== subject.code
+  ) {
+    const existing = await db.orm.public.Subject.first({
+      instituteId,
+      code: input.code,
+    });
+
+    if (existing && existing.id !== subjectId) {
+      throw new SubjectConflictError();
+    }
+  }
+
+  const updateData: {
+    name?: string;
+    code?: string;
+    description?: string;
+    status?: "active" | "inactive";
+  } = {};
+
+  if (input.name !== undefined) {
+    updateData.name = input.name;
+  }
+
+  if (input.code !== undefined) {
+    updateData.code = input.code;
+  }
+
+  if (input.description !== undefined) {
+    updateData.description = input.description;
+  }
+
+  if (input.status !== undefined) {
+    updateData.status = input.status;
+  }
+
+  return db.orm.public.Subject
+    .where({
+      id: subjectId,
+      instituteId,
+    })
+    .update(updateData);
 }

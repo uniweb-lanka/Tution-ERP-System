@@ -24,6 +24,12 @@ import {
   updateStream,
   StreamNotFoundError,
   StreamConflictError,
+  createSubject,
+  SubjectConflictError,
+  SubjectNotFoundError,
+  getSubject,
+  listSubjects,
+  updateSubject,
 } from "./academic.service.js";
 
 import {
@@ -33,6 +39,8 @@ import {
   updateGradeSchema,
   createStreamSchema,
   updateStreamSchema,
+  createSubjectSchema,
+  updateSubjectSchema,
 } from "./academic.schema.js";
 
 export const academicRouter = Router();
@@ -680,6 +688,220 @@ academicRouter.patch(
 
       response.status(500).json({
         error: "Failed to update stream",
+      });
+    }
+  },
+);
+
+/*
+ * GET /api/academic/subjects
+ */
+academicRouter.get(
+  "/subjects",
+  authenticate,
+  requireTenant,
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const subjects = await listSubjects(auth.instituteId);
+
+      response.status(200).json({
+        data: {
+          subjects,
+        },
+      });
+    } catch (error) {
+      console.error("GET /api/academic/subjects error:", error);
+
+      response.status(500).json({
+        error: "Failed to load subjects",
+      });
+    }
+  },
+);
+
+/*
+ * GET /api/academic/subjects/:id
+ */
+academicRouter.get(
+  "/subjects/:id",
+  authenticate,
+  requireTenant,
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const subjectId = request.params.id;
+
+      if (typeof subjectId !== "string") {
+        response.status(400).json({
+          error: "Subject ID is required",
+        });
+        return;
+      }
+
+      const subject = await getSubject(auth.instituteId, subjectId);
+
+      response.status(200).json({
+        data: {
+          subject,
+        },
+      });
+    } catch (error) {
+      if (error instanceof SubjectNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("GET /api/academic/subjects/:id error:", error);
+
+      response.status(500).json({
+        error: "Failed to load subject",
+      });
+    }
+  },
+);
+
+/*
+ * POST /api/academic/subjects
+ */
+academicRouter.post(
+  "/subjects",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const parsed = createSubjectSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        response.status(400).json({
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        });
+        return;
+      }
+
+      const subject = await createSubject(auth.instituteId, parsed.data);
+
+      response.status(201).json({
+        message: "Subject created successfully",
+        data: {
+          subject,
+        },
+      });
+    } catch (error) {
+      if (error instanceof SubjectConflictError) {
+        response.status(409).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("POST /api/academic/subjects error:", error);
+
+      response.status(500).json({
+        error: "Failed to create subject",
+      });
+    }
+  },
+);
+
+/*
+ * PATCH /api/academic/subjects/:id
+ */
+academicRouter.patch(
+  "/subjects/:id",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const subjectId = request.params.id;
+
+      if (typeof subjectId !== "string") {
+        response.status(400).json({
+          error: "Subject ID is required",
+        });
+        return;
+      }
+
+      const parsed = updateSubjectSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        response.status(400).json({
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        });
+        return;
+      }
+
+      const subject = await updateSubject(
+        auth.instituteId,
+        subjectId,
+        parsed.data,
+      );
+
+      response.status(200).json({
+        message: "Subject updated successfully",
+        data: {
+          subject,
+        },
+      });
+    } catch (error) {
+      if (error instanceof SubjectNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof SubjectConflictError) {
+        response.status(409).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("PATCH /api/academic/subjects/:id error:", error);
+
+      response.status(500).json({
+        error: "Failed to update subject",
       });
     }
   },
