@@ -1,0 +1,437 @@
+enum institute_status {
+  @@type("pg/text@1")
+
+  active    = "active"
+  inactive  = "inactive"
+  suspended = "suspended"
+  trial     = "trial"
+}
+
+enum membership_role {
+  @@type("pg/text@1")
+
+  owner   = "owner"
+  staff   = "staff"
+  teacher = "teacher"
+  student = "student"
+}
+
+enum membership_status {
+  @@type("pg/text@1")
+
+  active    = "active"
+  invited   = "invited"
+  suspended = "suspended"
+  inactive  = "inactive"
+}
+
+enum profile_status {
+  @@type("pg/text@1")
+
+  active    = "active"
+  inactive  = "inactive"
+  suspended = "suspended"
+  left      = "left"
+}
+
+enum gender {
+  @@type("pg/text@1")
+
+  male               = "male"
+  female             = "female"
+  other              = "other"
+  prefer_not_to_say  = "prefer_not_to_say"
+}
+
+enum teacher_type {
+  @@type("pg/text@1")
+
+  permanent = "permanent"
+  part_time = "part_time"
+  visiting  = "visiting"
+  contract  = "contract"
+}
+
+enum staff_type {
+  @@type("pg/text@1")
+
+  admin        = "admin"
+  accountant   = "accountant"
+  receptionist = "receptionist"
+  manager      = "manager"
+  support      = "support"
+  other        = "other"
+}
+
+enum academic_status {
+  @@type("pg/text@1")
+
+  active   = "active"
+  inactive = "inactive"
+}
+
+enum class_status {
+  @@type("pg/text@1")
+
+  draft     = "draft"
+  active    = "active"
+  completed = "completed"
+  cancelled = "cancelled"
+  archived  = "archived"
+}
+
+enum delivery_mode {
+  @@type("pg/text@1")
+
+  physical = "physical"
+  online   = "online"
+  hybrid   = "hybrid"
+}
+
+enum weekday {
+  @@type("pg/text@1")
+
+  monday    = "monday"
+  tuesday   = "tuesday"
+  wednesday = "wednesday"
+  thursday  = "thursday"
+  friday    = "friday"
+  saturday  = "saturday"
+  sunday    = "sunday"
+}
+
+enum enrollment_status {
+  @@type("pg/text@1")
+
+  active    = "active"
+  paused    = "paused"
+  completed = "completed"
+  cancelled = "cancelled"
+}
+
+model Enrollment {
+  id          String            @id @default(uuid())
+  instituteId String
+  studentId   String
+  classId     String
+  status      enrollment_status @default(active)
+  enrolledAt  DateTime          @default(now())
+  endedAt     DateTime?
+  notes       String?
+
+  student Student @relation(
+    fields: [studentId, instituteId],
+    references: [id, instituteId]
+  )
+
+  class Class @relation(
+    fields: [classId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([studentId, classId])
+  @@index([instituteId, status])
+  @@index([instituteId, studentId])
+  @@index([instituteId, classId])
+}
+
+model Class {
+  id          String        @id @default(uuid())
+  instituteId String
+  teacherId   String
+  subjectId   String
+  gradeId     String
+  streamId    String?
+
+  name          String
+  code          String
+  monthlyFee    Decimal?
+  capacity      Int?
+  deliveryMode  delivery_mode @default(physical)
+  status        class_status  @default(draft)
+  startsAt      DateTime?
+  endsAt        DateTime?
+
+  teacher Teacher @relation(
+    fields: [teacherId, instituteId],
+    references: [id, instituteId]
+  )
+
+  subject Subject @relation(
+    fields: [subjectId, instituteId],
+    references: [id, instituteId]
+  )
+
+  grade Grade @relation(
+    fields: [gradeId, instituteId],
+    references: [id, instituteId]
+  )
+
+  stream Stream? @relation(
+    fields: [streamId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, code])
+  @@index([instituteId, status])
+  @@index([instituteId, teacherId])
+}
+
+model ClassSchedule {
+  id          String   @id @default(uuid())
+  classId     String
+  instituteId String
+  day         weekday
+  startTime   String
+  endTime     String
+  room        String?
+  meetingUrl  String?
+
+  class Class @relation(
+    fields: [classId, instituteId],
+    references: [id, instituteId],
+    onDelete: Cascade
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([instituteId, classId])
+  @@index([instituteId, day])
+}
+
+model Institute {
+  id       String           @id @default(uuid())
+  name     String
+  slug     String           @unique
+  email    String?
+  phone    String?
+  timezone String           @default("Asia/Colombo")
+  currency String           @default("LKR")
+  status   institute_status @default(trial)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([status])
+}
+
+model User {
+  id              String   @id @default(uuid())
+  email           String   @unique
+  passwordHash    String?
+  firstName       String
+  lastName        String?
+  phone           String?
+  isPlatformAdmin Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+}
+
+model AuthSession {
+  id               String    @id @default(uuid())
+  userId           String
+  refreshTokenHash String
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  userAgent        String?
+  ipAddress        String?
+
+  user User @relation(
+    fields: [userId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model InstituteMembership {
+  id          String            @id @default(uuid())
+  instituteId String
+  userId      String
+  role        membership_role
+  status      membership_status @default(invited)
+  joinedAt    DateTime?
+
+  institute Institute @relation(fields: [instituteId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, userId])
+  @@index([userId])
+  @@index([instituteId, role])
+}
+
+model Student {
+  id           String         @id @default(uuid())
+  membershipId String
+  instituteId  String
+  studentCode  String
+  dateOfBirth  DateTime?
+  gender       gender?
+  admissionAt  DateTime       @default(now())
+  status       profile_status @default(active)
+  notes        String?
+
+  membership InstituteMembership @relation(
+    fields: [membershipId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@unique([membershipId, instituteId])
+  @@unique([instituteId, studentCode])
+  @@index([instituteId, status])
+  @@unique([id, instituteId])
+}
+
+model Teacher {
+  id             String         @id @default(uuid())
+  membershipId   String
+  instituteId    String
+  teacherCode    String
+  qualification  String?
+  specialization String?
+  bio            String?
+  teacherType    teacher_type   @default(part_time)
+  status         profile_status @default(active)
+  joinedAt       DateTime       @default(now())
+  leftAt         DateTime?
+
+  membership InstituteMembership @relation(
+    fields: [membershipId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@unique([membershipId, instituteId])
+  @@unique([instituteId, teacherCode])
+  @@index([instituteId, status])
+  @@unique([id, instituteId])
+}
+
+model Staff {
+  id           String         @id @default(uuid())
+  membershipId String
+  instituteId  String
+  staffCode    String
+  staffType    staff_type     @default(support)
+  status       profile_status @default(active)
+  joinedAt     DateTime       @default(now())
+  leftAt       DateTime?
+
+  membership InstituteMembership @relation(
+    fields: [membershipId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+  deletedAt DateTime?
+
+  @@unique([membershipId, instituteId])
+  @@unique([instituteId, staffCode])
+  @@index([instituteId, status])
+  @@unique([id, instituteId])
+}
+
+model EducationLevel {
+  id          String          @id @default(uuid())
+  instituteId String
+  name        String
+  code        String
+  displayOrder Int           @default(0)
+  status      academic_status @default(active)
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, code])
+  @@index([instituteId, status])
+}
+
+model Grade {
+  id               String          @id @default(uuid())
+  instituteId      String
+  educationLevelId String
+  name             String
+  code             String
+  displayOrder     Int             @default(0)
+  status           academic_status @default(active)
+
+  educationLevel EducationLevel @relation(
+    fields: [educationLevelId, instituteId],
+    references: [id, instituteId]
+  )
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, code])
+  @@index([instituteId, educationLevelId])
+  @@index([instituteId, status])
+}
+
+model Stream {
+  id          String          @id @default(uuid())
+  instituteId String
+  name        String
+  code        String
+  displayOrder Int            @default(0)
+  status      academic_status @default(active)
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, code])
+  @@index([instituteId, status])
+}
+
+model Subject {
+  id          String          @id @default(uuid())
+  instituteId String
+  name        String
+  code        String
+  description String?
+  status      academic_status @default(active)
+
+  institute Institute @relation(fields: [instituteId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@unique([id, instituteId])
+  @@unique([instituteId, code])
+  @@index([instituteId, status])
+}

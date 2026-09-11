@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: tuition-erp-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: tuition_erp
+      POSTGRES_USER: tuition_admin
+      POSTGRES_PASSWORD: tuition_password
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - tuition_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  tuition_postgres_data:

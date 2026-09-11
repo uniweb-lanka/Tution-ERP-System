@@ -1,0 +1,522 @@
+[
+  {
+    "id": "dropTable.test",
+    "label": "Drop table \"test\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "test"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"test\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"test\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop table \"test\"",
+        "sql": "DROP TABLE \"public\".\"test\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"test\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"test\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.institute",
+    "label": "Create table \"institute\"",
+    "summary": "Creates table \"institute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "institute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"institute\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"institute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"institute\"",
+        "sql": "CREATE TABLE \"public\".\"institute\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currency\" text DEFAULT 'LKR' NOT NULL,\n  \"email\" text,\n  \"id\" text NOT NULL,\n  \"name\" text NOT NULL,\n  \"phone\" text,\n  \"slug\" text NOT NULL,\n  \"status\" text DEFAULT 'trial' NOT NULL,\n  \"timezone\" text DEFAULT 'Asia/Colombo' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"institute_status_check_80c94e51\" CHECK (\"status\" IN ('active', 'inactive', 'suspended', 'trial'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"institute\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"institute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.instituteMembership",
+    "label": "Create table \"instituteMembership\"",
+    "summary": "Creates table \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"instituteMembership\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"instituteMembership\"",
+        "sql": "CREATE TABLE \"public\".\"instituteMembership\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"instituteId\" text NOT NULL,\n  \"joinedAt\" timestamptz,\n  \"role\" text NOT NULL,\n  \"status\" text DEFAULT 'invited' NOT NULL,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"userId\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"instituteMembership_role_check_9fa475f7\" CHECK (\"role\" IN ('owner', 'staff', 'teacher', 'student')),\n  CONSTRAINT \"instituteMembership_status_check_d192a39b\" CHECK (\"status\" IN ('active', 'invited', 'suspended', 'inactive'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"instituteMembership\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.user",
+    "label": "Create table \"user\"",
+    "summary": "Creates table \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"user\"",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"deletedAt\" timestamptz,\n  \"email\" text NOT NULL,\n  \"firstName\" text NOT NULL,\n  \"id\" text NOT NULL,\n  \"isPlatformAdmin\" bool DEFAULT false NOT NULL,\n  \"lastName\" text,\n  \"passwordHash\" text,\n  \"phone\" text,\n  \"updatedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.institute.institute_slug_key",
+    "label": "Add unique constraint on \"institute\" (slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "institute_slug_key",
+        "table": "institute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"institute_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "institute_slug_key",
+          "public",
+          "\"public\".\"institute\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"institute_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"institute\" ADD CONSTRAINT \"institute_slug_key\" UNIQUE (\"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"institute_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "institute_slug_key",
+          "public",
+          "\"public\".\"institute\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.instituteMembership.instituteMembership_instituteId_userId_key",
+    "label": "Add unique constraint on \"instituteMembership\" (instituteId, userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "instituteMembership_instituteId_userId_key",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"instituteMembership_instituteId_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_instituteId_userId_key",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"instituteMembership_instituteId_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"instituteMembership\" ADD CONSTRAINT \"instituteMembership_instituteId_userId_key\" UNIQUE (\"instituteId\", \"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"instituteMembership_instituteId_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_instituteId_userId_key",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.user.user_email_key",
+    "label": "Add unique constraint on \"user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_email_key",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.institute.institute_status_idx_e98638ab",
+    "label": "Create index \"institute_status_idx_e98638ab\" on \"institute\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "institute_status_idx_e98638ab",
+        "table": "institute"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"institute_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"institute_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"institute_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"institute_status_idx_e98638ab\" ON \"public\".\"institute\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"institute_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"institute_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.instituteMembership.instituteMembership_instituteId_idx_7d2fe6f2",
+    "label": "Create index \"instituteMembership_instituteId_idx_7d2fe6f2\" on \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "instituteMembership_instituteId_idx_7d2fe6f2",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"instituteMembership_instituteId_idx_7d2fe6f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"instituteMembership_instituteId_idx_7d2fe6f2\"",
+        "sql": "CREATE INDEX \"instituteMembership_instituteId_idx_7d2fe6f2\" ON \"public\".\"instituteMembership\" (\"instituteId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"instituteMembership_instituteId_idx_7d2fe6f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_instituteId_idx_7d2fe6f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.instituteMembership.instituteMembership_instituteId_role_idx_8c2d6a2e",
+    "label": "Create index \"instituteMembership_instituteId_role_idx_8c2d6a2e\" on \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "instituteMembership_instituteId_role_idx_8c2d6a2e",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"instituteMembership_instituteId_role_idx_8c2d6a2e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_instituteId_role_idx_8c2d6a2e\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"instituteMembership_instituteId_role_idx_8c2d6a2e\"",
+        "sql": "CREATE INDEX \"instituteMembership_instituteId_role_idx_8c2d6a2e\" ON \"public\".\"instituteMembership\" (\"instituteId\", \"role\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"instituteMembership_instituteId_role_idx_8c2d6a2e\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_instituteId_role_idx_8c2d6a2e\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.instituteMembership.instituteMembership_userId_idx_a489d58a",
+    "label": "Create index \"instituteMembership_userId_idx_a489d58a\" on \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "instituteMembership_userId_idx_a489d58a",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"instituteMembership_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"instituteMembership_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"instituteMembership_userId_idx_a489d58a\" ON \"public\".\"instituteMembership\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"instituteMembership_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"instituteMembership_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.instituteMembership.instituteMembership_instituteId_fkey",
+    "label": "Add foreign key \"instituteMembership_instituteId_fkey\" on \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "instituteMembership_instituteId_fkey",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"instituteMembership_instituteId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_instituteId_fkey",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"instituteMembership_instituteId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"instituteMembership\"\nADD CONSTRAINT \"instituteMembership_instituteId_fkey\"\nFOREIGN KEY (\"instituteId\")\nREFERENCES \"public\".\"institute\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"instituteMembership_instituteId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_instituteId_fkey",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.instituteMembership.instituteMembership_userId_fkey",
+    "label": "Add foreign key \"instituteMembership_userId_fkey\" on \"instituteMembership\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "instituteMembership_userId_fkey",
+        "table": "instituteMembership"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"instituteMembership_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_userId_fkey",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"instituteMembership_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"instituteMembership\"\nADD CONSTRAINT \"instituteMembership_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"instituteMembership_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "instituteMembership_userId_fkey",
+          "public",
+          "\"public\".\"instituteMembership\""
+        ]
+      }
+    ]
+  }
+]
