@@ -180,3 +180,4 @@ export type CreateSubjectInput = z.infer<
 export type UpdateSubjectInput = z.infer<
   typeof updateSubjectSchema
 >;
+
