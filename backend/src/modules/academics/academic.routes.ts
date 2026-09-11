@@ -30,6 +30,16 @@ import {
   getSubject,
   listSubjects,
   updateSubject,
+  createClass,
+  ClassConflictError,
+  ClassNotFoundError,
+  TeacherForClassNotFoundError,
+  SubjectForClassNotFoundError,
+  GradeForClassNotFoundError,
+  StreamForClassNotFoundError,
+  getClass,
+  listClasses,
+  updateClass,
 } from "./academic.service.js";
 
 import {
@@ -41,6 +51,8 @@ import {
   updateStreamSchema,
   createSubjectSchema,
   updateSubjectSchema,
+  createClassSchema,
+  updateClassSchema,
 } from "./academic.schema.js";
 
 export const academicRouter = Router();
@@ -902,6 +914,276 @@ academicRouter.patch(
 
       response.status(500).json({
         error: "Failed to update subject",
+      });
+    }
+  },
+);
+
+/*
+ * GET /api/academic/classes
+ */
+academicRouter.get(
+  "/classes",
+  authenticate,
+  requireTenant,
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const classes = await listClasses(auth.instituteId);
+
+      response.status(200).json({
+        data: {
+          classes,
+        },
+      });
+    } catch (error) {
+      console.error("GET /api/academic/classes error:", error);
+
+      response.status(500).json({
+        error: "Failed to load classes",
+      });
+    }
+  },
+);
+
+/*
+ * GET /api/academic/classes/:id
+ */
+academicRouter.get(
+  "/classes/:id",
+  authenticate,
+  requireTenant,
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const classId = request.params.id;
+
+      if (typeof classId !== "string") {
+        response.status(400).json({
+          error: "Class ID is required",
+        });
+        return;
+      }
+
+      const classRecord = await getClass(auth.instituteId, classId);
+
+      response.status(200).json({
+        data: {
+          class: classRecord,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("GET /api/academic/classes/:id error:", error);
+
+      response.status(500).json({
+        error: "Failed to load class",
+      });
+    }
+  },
+);
+
+/*
+ * POST /api/academic/classes
+ */
+academicRouter.post(
+  "/classes",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const parsed = createClassSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        response.status(400).json({
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        });
+        return;
+      }
+
+      const classRecord = await createClass(auth.instituteId, parsed.data);
+
+      response.status(201).json({
+        message: "Class created successfully",
+        data: {
+          class: classRecord,
+        },
+      });
+    } catch (error) {
+      if (error instanceof TeacherForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof SubjectForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof GradeForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof StreamForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof ClassConflictError) {
+        response.status(409).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("POST /api/academic/classes error:", error);
+
+      response.status(500).json({
+        error: "Failed to create class",
+      });
+    }
+  },
+);
+
+/*
+ * PATCH /api/academic/classes/:id
+ */
+academicRouter.patch(
+  "/classes/:id",
+  authenticate,
+  requireTenant,
+  authorize("owner"),
+  async (request, response) => {
+    try {
+      const auth = request.auth;
+
+      if (!auth) {
+        response.status(401).json({
+          error: "Authentication required",
+        });
+        return;
+      }
+
+      const classId = request.params.id;
+
+      if (typeof classId !== "string") {
+        response.status(400).json({
+          error: "Class ID is required",
+        });
+        return;
+      }
+
+      const parsed = updateClassSchema.safeParse(request.body);
+
+      if (!parsed.success) {
+        response.status(400).json({
+          error: "Validation failed",
+          details: parsed.error.flatten(),
+        });
+        return;
+      }
+
+      const classRecord = await updateClass(
+        auth.instituteId,
+        classId,
+        parsed.data,
+      );
+
+      response.status(200).json({
+        message: "Class updated successfully",
+        data: {
+          class: classRecord,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof TeacherForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof SubjectForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof GradeForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof StreamForClassNotFoundError) {
+        response.status(404).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      if (error instanceof ClassConflictError) {
+        response.status(409).json({
+          error: error.message,
+        });
+        return;
+      }
+
+      console.error("PATCH /api/academic/classes/:id error:", error);
+
+      response.status(500).json({
+        error: "Failed to update class",
       });
     }
   },
