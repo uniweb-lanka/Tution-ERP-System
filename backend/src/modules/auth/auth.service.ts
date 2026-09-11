@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { Temporal } from "temporal-polyfill";
 
-import { db } from "../db/db.js";
+import { db } from "../../db/db.js";
 import type { LoginInput, RegisterInput } from "./auth.schema.js";
 import {
   createAccessToken,

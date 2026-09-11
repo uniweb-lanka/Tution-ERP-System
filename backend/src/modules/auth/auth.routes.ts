@@ -7,8 +7,8 @@ import {
   registerInstituteOwner,
 } from "./auth.service.js";
 import { loginSchema, registerSchema } from "./auth.schema.js";
-import { authenticate } from "../middleware/auth.middleware.js";
-import { db } from "../db/db.js";
+import { authenticate } from "../../middleware/auth.middleware.js";
+import { db } from "../../db/db.js";
 import {
   AuthRefreshError,
   logoutUser,

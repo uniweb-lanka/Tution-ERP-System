@@ -5,7 +5,7 @@ import helmet from "helmet";
 
 import { env } from "./config/env.js";
 import { healthRouter } from "./routes/health.js";
-import { authRouter } from "./auth/auth.routes.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
 
 export function createApp() {
   const app = express();

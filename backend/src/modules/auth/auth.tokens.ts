@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import jwt, { type SignOptions } from "jsonwebtoken";
 import { Temporal } from "temporal-polyfill";
 
-import { env } from "../config/env.js";
+import { env } from "../../config/env.js";
 
 export type AccessTokenPayload = {
   sub: string;

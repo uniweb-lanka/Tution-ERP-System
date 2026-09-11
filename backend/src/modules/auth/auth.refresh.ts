@@ -2,8 +2,8 @@ import crypto from "node:crypto";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { Temporal } from "temporal-polyfill";
 
-import { db } from "../db/db.js";
-import { env } from "../config/env.js";
+import { db } from "../../db/db.js";
+import { env } from "../../config/env.js";
 import {
   createAccessToken,
   createRefreshToken,
@@ -200,11 +200,9 @@ export async function logoutUser(refreshToken: string) {
     return;
   }
 
-  await db.orm.public.AuthSession
-    .where({
-      id: session.id,
-    })
-    .update({
-      revokedAt: Temporal.Now.instant(),
-    });
+  await db.orm.public.AuthSession.where({
+    id: session.id,
+  }).update({
+    revokedAt: Temporal.Now.instant(),
+  });
 }
